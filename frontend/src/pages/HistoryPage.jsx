@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+
 const BADGE_MAP = {
   Empty:  'badge badge-empty',
   Low:    'badge badge-low',
@@ -10,20 +12,20 @@ const LABEL_MAP = {
   Empty: 'Kosong', Low: 'Sepi', Medium: 'Sedang', High: 'Padat', Heavy: 'Macet',
 };
 
-const SAMPLE_DATA = [
-  { day: 'Senin',  hour: '06', minute: '08', density: 'Empty',  total: 5,  time: '2026-06-01 06:08' },
-  { day: 'Senin',  hour: '08', minute: '39', density: 'Medium', total: 21, time: '2026-06-01 08:39' },
-  { day: 'Selasa', hour: '09', minute: '51', density: 'Medium', total: 21, time: '2026-06-02 09:51' },
-  { day: 'Selasa', hour: '07', minute: '12', density: 'Low',    total: 9,  time: '2026-06-02 07:12' },
-  { day: 'Rabu',   hour: '17', minute: '30', density: 'High',   total: 18, time: '2026-06-04 17:30' },
-  { day: 'Kamis',  hour: '06', minute: '15', density: 'Empty',  total: 3,  time: '2026-05-28 06:15' },
-  { day: 'Kamis',  hour: '08', minute: '05', density: 'High',   total: 20, time: '2026-05-28 08:05' },
-  { day: 'Jumat',  hour: '17', minute: '15', density: 'Heavy',  total: 26, time: '2026-05-29 17:15' },
-  { day: 'Sabtu',  hour: '10', minute: '09', density: 'Medium', total: 22, time: '2026-05-30 10:09' },
-  { day: 'Minggu', hour: '09', minute: '00', density: 'Low',    total: 8,  time: '2026-06-07 09:00' },
-];
-
 export default function HistoryPage({ extraHistory = [] }) {
+  const [savedHistory, setSavedHistory] = useState([]);
+
+  useEffect(() => {
+    fetch('http://127.0.0.1:8000/history')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setSavedHistory(data);
+        }
+      })
+      .catch(err => console.error("Error fetching history:", err));
+  }, []);
+
   const allData = [
     ...extraHistory.map(h => ({
       day: h.day,
@@ -33,7 +35,7 @@ export default function HistoryPage({ extraHistory = [] }) {
       total: '—',
       time: h.timestamp?.toLocaleString('id-ID') ?? '—',
     })).reverse(),
-    ...SAMPLE_DATA,
+    ...savedHistory,
   ];
 
   return (

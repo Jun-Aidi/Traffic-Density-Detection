@@ -1,24 +1,27 @@
-const HOUR_LABELS = ['06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23'];
-const HOUR_DATA   = [  3,   6,  19,  14,   9,   8,   8,   9,  10,  12,  17,  21,  14,   6,   3,   2,   1,   0 ];
-const MAX_VAL = Math.max(...HOUR_DATA);
-
-const DENSITY_DIST = [
-  { label: 'Kosong (Empty)',  count: 61, color: 'bg-slate-400' },
-  { label: 'Sepi (Low)',      count: 23, color: 'bg-green-500' },
-  { label: 'Sedang (Medium)', count: 11, color: 'bg-amber-500' },
-  { label: 'Padat (High)',    count: 4,  color: 'bg-orange-500' },
-  { label: 'Macet (Heavy)',   count: 1,  color: 'bg-red-500' },
-];
-
-const VEHICLE_TYPES = [
-  { label: 'Sepeda Motor',  pct: 48, color: 'bg-brand-500' },
-  { label: 'Mobil',         pct: 33, color: 'bg-cyan-500' },
-  { label: 'Bus',           pct: 11, color: 'bg-amber-500' },
-  { label: 'Truk',          pct: 6,  color: 'bg-orange-500' },
-  { label: 'Lainnya',       pct: 2,  color: 'bg-slate-400' },
-];
+import { useState, useEffect } from 'react';
 
 export default function AnalyticsPage() {
+  const [analytics, setAnalytics] = useState({
+    hour_data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    density_dist: [],
+    vehicle_types: []
+  });
+
+  useEffect(() => {
+    fetch('http://127.0.0.1:8000/analytics')
+      .then(r => r.json())
+      .then(d => {
+        if (d && d.hour_data) setAnalytics(d);
+      })
+      .catch(e => console.error("Error fetching analytics:", e));
+  }, []);
+
+  const HOUR_LABELS = ['06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23'];
+  const HOUR_DATA   = analytics.hour_data;
+  const MAX_VAL = Math.max(...HOUR_DATA, 1);
+
+  const DENSITY_DIST = analytics.density_dist;
+  const VEHICLE_TYPES = analytics.vehicle_types;
   return (
     <div className="space-y-6">
       {/* Bar Chart — Vehicles per Hour */}

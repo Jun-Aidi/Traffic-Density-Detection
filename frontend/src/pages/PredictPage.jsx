@@ -32,16 +32,44 @@ export default function PredictPage({ onAddHistory }) {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  function handlePredict(e) {
+  async function handlePredict(e) {
     e.preventDefault();
     setLoading(true);
     setResult(null);
-    setTimeout(() => {
-      const pred = simulatePredict(day, hour);
-      setResult(pred);
+    
+    try {
+      const response = await fetch('http://127.0.0.1:8000/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          day: parseInt(day),
+          hour: parseInt(hour),
+          minute: parseInt(minute)
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.density) {
+        setResult(data.density);
+        onAddHistory?.({ 
+          day: DAYS[day], 
+          hour, 
+          minute, 
+          density: data.density, 
+          timestamp: new Date() 
+        });
+      } else {
+        // Fallback jika terjadi error
+        console.error("API Error:", data);
+        setResult('Empty');
+      }
+    } catch (error) {
+      console.error("Network Error:", error);
+      alert("Gagal terhubung ke Backend API! Pastikan server FastAPI (Python) sudah berjalan.");
+    } finally {
       setLoading(false);
-      onAddHistory?.({ day: DAYS[day], hour, minute, density: pred, timestamp: new Date() });
-    }, 1400);
+    }
   }
 
   const info = result ? DENSITY_LEVELS[result] : null;
@@ -81,8 +109,10 @@ export default function PredictPage({ onAddHistory }) {
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Menit</label>
-              <select value={minute} onChange={e => setMinute(e.target.value)} className="form-select">
-                {['00', '15', '30', '45'].map(m => <option key={m} value={m}>{m}</option>)}
+              <select value={minute} onChange={e => setMinute(e.target.value)} className="form-select max-h-48">
+                {Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0')).map(m => (
+                  <option key={m} value={m}>{m}</option>
+                ))}
               </select>
             </div>
           </div>
