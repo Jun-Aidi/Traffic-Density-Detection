@@ -24,12 +24,12 @@ export default function App() {
   const meta = PAGE_META[activePage] ?? PAGE_META.dashboard;
 
   return (
-    <div className="flex min-h-screen bg-slate-950">
+    <div className="flex min-h-screen bg-slate-100">
       {/* Sidebar */}
       <Sidebar activePage={activePage} onNavigate={setActivePage} />
 
       {/* Main Content */}
-      <main className="flex-1 ml-64 p-8 overflow-auto">
+      <main className="flex-1 md:ml-64 p-4 md:p-8 pb-24 md:pb-8 overflow-auto">
         <Header title={meta.title} subtitle={meta.subtitle} />
 
         {activePage === 'dashboard' && <DashboardPage />}

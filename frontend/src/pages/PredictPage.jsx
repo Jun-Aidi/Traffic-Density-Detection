@@ -74,8 +74,8 @@ export default function PredictPage({ onAddHistory }) {
             <div>
               <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Jam</label>
               <select value={hour} onChange={e => setHour(e.target.value)} className="form-select">
-                {[...Array(24)].map((_, i) => (
-                  <option key={i} value={i}>{i.toString().padStart(2, '0')}:00</option>
+                {Array.from({ length: 18 }, (_, i) => i + 6).map((h) => (
+                  <option key={h} value={h}>{h.toString().padStart(2, '0')}:00</option>
                 ))}
               </select>
             </div>
