@@ -1,0 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; }
+  body {
+    @apply bg-slate-100 text-slate-800 font-sans antialiased;
+    margin: 0;
+    padding: 0;
+  }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { @apply bg-slate-200; }
+  ::-webkit-scrollbar-thumb { @apply bg-slate-300 rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-brand-500; }
+}
+
+@layer components {
+  .sidebar-link {
+    @apply flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:text-slate-800 hover:bg-slate-100 transition-all duration-200 text-sm font-medium cursor-pointer w-full text-left;
+  }
+  .sidebar-link.active {
+    @apply bg-brand-500/10 text-brand-600 font-semibold;
+  }
+  .card {
+    @apply bg-white border border-slate-200 rounded-2xl shadow-sm;
+  }
+  .stat-card {
+    @apply bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow duration-300;
+  }
+  .btn-primary {
+    @apply bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-400 hover:to-brand-500 text-white font-semibold py-2.5 px-6 rounded-xl transition-all duration-200 shadow-sm;
+  }
+  .form-select {
+    @apply w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-slate-800 text-sm focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all;
+  }
+  .table-row {
+    @apply border-b border-slate-100 hover:bg-slate-50 transition-colors duration-150;
+  }
+  .badge {
+    @apply px-2.5 py-1 rounded-full text-xs font-semibold;
+  }
+  .badge-empty  { @apply bg-slate-100 text-slate-500; }
+  .badge-low    { @apply bg-green-100 text-green-700; }
+  .badge-medium { @apply bg-amber-100 text-amber-700; }
+  .badge-high   { @apply bg-orange-100 text-orange-700; }
+  .badge-heavy  { @apply bg-red-100 text-red-700; }
+}
