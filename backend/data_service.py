@@ -156,7 +156,7 @@ def load_analytics_data():
             {"label": "Mobil", "pct": int((counts[3] / total_vehicles) * 100), "color": "bg-cyan-500"},
             {"label": "Bus", "pct": int((counts[4] / total_vehicles) * 100), "color": "bg-amber-500"},
             {"label": "Truk", "pct": int((counts[5] / total_vehicles) * 100), "color": "bg-orange-500"},
-            {"label": "Lainnya", "pct": int((counts[1] / total_vehicles) * 100), "color": "bg-slate-400"},
+            {"label": "Sepeda", "pct": int((counts[1] / total_vehicles) * 100), "color": "bg-emerald-500"},
         ]
         vehicle_types.sort(key=lambda x: x['pct'], reverse=True)
 
@@ -198,3 +198,62 @@ def load_analytics_data():
         "highlights": final_highlights
     }
     return _analytics_cache
+
+
+# 3. HEATMAP DATA (day x hour average vehicle count)
+_heatmap_cache = None
+
+def load_heatmap_data():
+    global _heatmap_cache
+    if _heatmap_cache is not None:
+        return _heatmap_cache
+
+    DAY_ORDER = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']
+    HOURS = list(range(6, 24))  # 06:00 - 23:00
+
+    # Initialize accumulator: day -> hour -> list of counts
+    accumulator = {day: {h: [] for h in HOURS} for day in DAY_ORDER}
+
+    csv_files = glob.glob(os.path.join(DATA_DIR, "*.csv"))
+    for f in csv_files:
+        try:
+            day_name = os.path.basename(f).replace('.csv', '')
+            if day_name not in DAY_ORDER:
+                continue
+            df = pd.read_csv(f, header=None)
+            for _, row in df.iterrows():
+                if len(row) < 9:
+                    continue
+                try:
+                    dt = pd.to_datetime(row[1])
+                    total_count = int(row[3])
+                    if 6 <= dt.hour <= 23:
+                        accumulator[day_name][dt.hour].append(total_count)
+                except:
+                    pass
+        except Exception as e:
+            print(f"Heatmap error reading {f}: {e}")
+
+    # Build result matrix: list of {day, hour, avg}
+    matrix = []
+    for day in DAY_ORDER:
+        for h in HOURS:
+            vals = accumulator[day][h]
+            avg = round(sum(vals) / len(vals), 1) if vals else 0
+            matrix.append({
+                "day": day,
+                "hour": h,
+                "avg": avg
+            })
+
+    # Global max for normalizing colors
+    all_avgs = [item["avg"] for item in matrix]
+    global_max = max(all_avgs) if all_avgs else 1
+
+    _heatmap_cache = {
+        "matrix": matrix,
+        "days": DAY_ORDER,
+        "hours": HOURS,
+        "max_avg": global_max
+    }
+    return _heatmap_cache
