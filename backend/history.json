@@ -1,5 +1,293 @@
 [
     {
+        "day": "Selasa",
+        "hour": "08",
+        "minute": "07",
+        "density": "Empty",
+        "timestamp": "2026-06-09 08:07:31",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "08",
+        "minute": "07",
+        "density": "Empty",
+        "timestamp": "2026-06-09 08:07:31",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "08",
+        "minute": "06",
+        "density": "Low",
+        "timestamp": "2026-06-09 08:06:05",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "08",
+        "minute": "04",
+        "density": "Empty",
+        "timestamp": "2026-06-09 08:04:05",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "50",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:50:06",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "50",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:50:06",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "50",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:50:04",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "50",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:50:04",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "49",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:49:39",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "49",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:49:39",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "47",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:47:13",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "47",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:47:13",
+        "total": "\u2014"
+    },
+    {
+        "day": "Minggu",
+        "hour": "14",
+        "minute": "16",
+        "density": "Medium",
+        "timestamp": "2026-06-09 01:47:09",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "46",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:46:54",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "46",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:46:54",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "45",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:45:38",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "45",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:45:38",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "45",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:45:31",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "45",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:45:31",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "45",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:45:20",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "45",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:45:20",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "44",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:44:54",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "44",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:44:54",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "44",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:44:48",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "44",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:44:48",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "43",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:43:31",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "43",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:43:30",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "43",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:43:30",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "43",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:43:03",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "43",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:43:03",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "42",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:42:47",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "42",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:42:47",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "42",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:42:16",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "42",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:42:16",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "37",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:37:20",
+        "total": "\u2014"
+    },
+    {
+        "day": "Selasa",
+        "hour": "01",
+        "minute": "37",
+        "density": "Empty",
+        "timestamp": "2026-06-09 01:37:20",
+        "total": "\u2014"
+    },
+    {
         "day": "Sabtu",
         "hour": "10",
         "minute": "00",

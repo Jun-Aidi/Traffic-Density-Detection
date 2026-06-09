@@ -42,26 +42,33 @@ export default function AnalyticsPage() {
         <div className="flex items-center gap-4 mb-5 mt-3 ml-1">
           <div className="flex items-center gap-1.5">
             <span className="w-3 h-3 rounded-sm bg-brand-500 inline-block"></span>
-            <span className="text-xs text-slate-500">Normal</span>
+            <span className="text-xs text-slate-500">Normal (&lt;8 kendaraan)</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-3 h-3 rounded-sm bg-amber-500 inline-block"></span>
-            <span className="text-xs text-slate-500">Rush Hour (≥15)</span>
+            <span className="text-xs text-slate-500">Sibuk (≥8 kendaraan)</span>
           </div>
         </div>
 
-        <div className="flex items-end gap-2 h-44 px-1">
+        {/* Bar chart area */}
+        <div className="flex items-end gap-1.5 px-1" style={{ height: '180px' }}>
           {HOUR_DATA.map((val, i) => {
-            const heightPct = Math.round((val / MAX_VAL) * 100);
-            const isRush = val >= 15;
+            const BAR_MAX_PX = 150;
+            const barH = Math.max(Math.round((val / MAX_VAL) * BAR_MAX_PX), 6);
+            const isRush = val >= 8;
             return (
-              <div key={i} className="flex-1 flex flex-col items-center gap-1 group cursor-default">
-                <span className="text-xs text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity font-mono font-semibold">
+              <div key={i} className="flex-1 flex flex-col items-center justify-end gap-1 h-full cursor-default group">
+                <span className="text-xs font-mono font-bold" style={{ color: isRush ? '#b45309' : '#4338ca' }}>
                   {val}
                 </span>
                 <div
-                  className={`w-full rounded-t-lg transition-all duration-500 ${isRush ? 'bg-amber-400' : 'bg-brand-400'} hover:brightness-110`}
-                  style={{ height: `${heightPct}%` }}
+                  className="w-full rounded-t-md transition-all duration-700"
+                  style={{
+                    height: `${barH}px`,
+                    backgroundColor: isRush ? '#f59e0b' : '#6366f1',
+                    minHeight: '6px',
+                  }}
+                  title={`Jam ${HOUR_LABELS[i]}:00 — rata-rata ${val} kendaraan/frame`}
                 />
               </div>
             );

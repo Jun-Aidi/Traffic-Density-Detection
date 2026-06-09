@@ -1,23 +1,22 @@
 import { useState, useEffect } from 'react';
 
 const ACCENT = {
-  brand: { icon: 'text-brand-600 bg-brand-50',  value: 'text-brand-600' },
-  amber: { icon: 'text-amber-600 bg-amber-50',  value: 'text-amber-600' },
-  green: { icon: 'text-green-600 bg-green-50',  value: 'text-green-600' },
-  cyan:  { icon: 'text-cyan-600 bg-cyan-50',    value: 'text-cyan-600'  },
+  brand: { icon: 'text-brand-600 bg-brand-50', value: 'text-brand-600' },
+  amber: { icon: 'text-amber-600 bg-amber-50', value: 'text-amber-600' },
+  green: { icon: 'text-green-600 bg-green-50', value: 'text-green-600' },
+  cyan: { icon: 'text-cyan-600 bg-cyan-50', value: 'text-cyan-600' },
 };
 
 const RECENT = [
-  { day: 'Jumat',  time: '17:15', density: 'Macet',  badge: 'badge badge-heavy',  advice: 'Hindari jam pulang kerja' },
-  { day: 'Senin',  time: '08:39', density: 'Sedang', badge: 'badge badge-medium', advice: 'Jam sekolah dan kerja' },
-  { day: 'Sabtu',  time: '10:09', density: 'Sedang', badge: 'badge badge-medium', advice: 'Aktivitas akhir pekan' },
-  { day: 'Kamis',  time: '08:05', density: 'Padat',  badge: 'badge badge-high',   advice: 'Rush hour pagi' },
+  { day: 'Jumat', time: '17:15', density: 'Macet', badge: 'badge badge-heavy', advice: 'Hindari jam pulang kerja' },
+  { day: 'Senin', time: '08:39', density: 'Sedang', badge: 'badge badge-medium', advice: 'Jam sekolah dan kerja' },
+  { day: 'Sabtu', time: '10:09', density: 'Sedang', badge: 'badge badge-medium', advice: 'Aktivitas akhir pekan' },
+  { day: 'Kamis', time: '08:05', density: 'Padat', badge: 'badge badge-high', advice: 'Rush hour pagi' },
 ];
 
 export default function DashboardPage() {
   const [statsData, setStatsData] = useState({
     total: '...',
-    accuracy: '...',
     dominant: '...',
     busiest: '...'
   });
@@ -28,7 +27,7 @@ export default function DashboardPage() {
     bg: 'bg-slate-100',
     border: 'border-slate-200'
   });
-  
+
   const [highlights, setHighlights] = useState([]);
 
   useEffect(() => {
@@ -39,7 +38,6 @@ export default function DashboardPage() {
         if (data && data.total_data) {
           setStatsData({
             total: data.total_data,
-            accuracy: data.accuracy,
             dominant: data.dominant_vehicle,
             busiest: data.busiest_hour
           });
@@ -53,9 +51,9 @@ export default function DashboardPage() {
     // 2. Fetch Real-time Prediction for "Status Saat Ini"
     const now = new Date();
     // JS getDay(): 0=Minggu, 1=Senin. Model: 0=Senin, 6=Minggu.
-    const dayMapping = [6, 0, 1, 2, 3, 4, 5]; 
+    const dayMapping = [6, 0, 1, 2, 3, 4, 5];
     const currentDay = dayMapping[now.getDay()];
-    
+
     fetch('http://127.0.0.1:8000/predict', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -65,27 +63,27 @@ export default function DashboardPage() {
         minute: now.getMinutes()
       })
     })
-    .then(res => res.json())
-    .then(data => {
-      if (data.density) {
-        const densityMapping = {
-          Empty:  { label: 'Kosong', color: 'text-slate-600',  bg: 'bg-slate-100', border: 'border-slate-300' },
-          Low:    { label: 'Sepi',   color: 'text-green-700',  bg: 'bg-green-50',  border: 'border-green-200' },
-          Medium: { label: 'Sedang', color: 'text-amber-700',  bg: 'bg-amber-50',  border: 'border-amber-200' },
-          High:   { label: 'Padat',  color: 'text-orange-700', bg: 'bg-orange-50', border: 'border-orange-200' },
-          Heavy:  { label: 'Macet',  color: 'text-red-700',    bg: 'bg-red-50',    border: 'border-red-200' },
-        };
-        setCurrentStatus(densityMapping[data.density] || densityMapping.Empty);
-      }
-    })
-    .catch(err => console.error("Error fetching current prediction:", err));
+      .then(res => res.json())
+      .then(data => {
+        if (data.density) {
+          const densityMapping = {
+            Empty: { label: 'Kosong', color: 'text-slate-600', bg: 'bg-slate-100', border: 'border-slate-300' },
+            Low: { label: 'Sepi', color: 'text-green-700', bg: 'bg-green-50', border: 'border-green-200' },
+            Medium: { label: 'Sedang', color: 'text-amber-700', bg: 'bg-amber-50', border: 'border-amber-200' },
+            High: { label: 'Padat', color: 'text-orange-700', bg: 'bg-orange-50', border: 'border-orange-200' },
+            Heavy: { label: 'Macet', color: 'text-red-700', bg: 'bg-red-50', border: 'border-red-200' },
+          };
+          setCurrentStatus(densityMapping[data.density] || densityMapping.Empty);
+        }
+      })
+      .catch(err => console.error("Error fetching current prediction:", err));
   }, []);
 
   const STATS = [
     {
       label: 'Total Data Direkam',
       value: statsData.total,
-      sub: '7 hari | 06:00 – 00:00',
+      sub: '06:00 – 00:00',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
@@ -104,17 +102,7 @@ export default function DashboardPage() {
       ),
       accent: 'amber',
     },
-    {
-      label: 'Akurasi Model',
-      value: statsData.accuracy,
-      sub: 'Random Forest Classifier',
-      icon: (
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      ),
-      accent: 'green',
-    },
+
     {
       label: 'Kendaraan Dominan',
       value: statsData.dominant,
@@ -129,13 +117,13 @@ export default function DashboardPage() {
   ];
 
   const now = new Date();
-  const dayName = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'][now.getDay()];
-  const timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  const dayName = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][now.getDay()];
+  const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
 
   return (
     <div className="space-y-6">
       {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {STATS.map((s, i) => {
           const ac = ACCENT[s.accent];
           return (
@@ -155,10 +143,10 @@ export default function DashboardPage() {
 
       {/* Bottom row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         {/* Left Column (Status + Indicators) */}
         <div className="flex flex-col gap-6">
-          
+
           {/* Current Status */}
           <div className="card p-6 flex flex-col gap-5">
             <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Status Saat Ini</h3>
@@ -170,8 +158,8 @@ export default function DashboardPage() {
 
             <div className="space-y-0">
               {[
-                { label: 'Jam',   val: timeStr },
-                { label: 'Hari',  val: dayName },
+                { label: 'Jam', val: timeStr },
+                { label: 'Hari', val: dayName },
                 { label: 'Model', val: 'Random Forest' },
               ].map(r => (
                 <div key={r.label} className="flex justify-between py-2.5 border-b border-slate-100 last:border-0">
@@ -184,26 +172,26 @@ export default function DashboardPage() {
 
           {/* Indikator Kepadatan */}
           <div className="card p-6 flex flex-col gap-4">
-             <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Indikator Kepadatan</h3>
-             <div className="space-y-3 mt-1">
-                <div className="flex justify-between items-center border-b border-slate-50 pb-2">
-                  <span className="badge badge-empty">Kosong</span><span className="text-sm font-medium text-slate-500">0 - 10 unit</span>
-                </div>
-                <div className="flex justify-between items-center border-b border-slate-50 pb-2">
-                  <span className="badge badge-low">Sepi</span><span className="text-sm font-medium text-slate-500">11 - 20 unit</span>
-                </div>
-                <div className="flex justify-between items-center border-b border-slate-50 pb-2">
-                  <span className="badge badge-medium">Sedang</span><span className="text-sm font-medium text-slate-500">21 - 30 unit</span>
-                </div>
-                <div className="flex justify-between items-center border-b border-slate-50 pb-2">
-                  <span className="badge badge-high">Padat</span><span className="text-sm font-medium text-slate-500">31 - 40 unit</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="badge badge-heavy">Macet</span><span className="text-sm font-medium text-slate-500">&gt; 40 unit</span>
-                </div>
-             </div>
+            <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Indikator Kepadatan</h3>
+            <div className="space-y-3 mt-1">
+              <div className="flex justify-between items-center border-b border-slate-50 pb-2">
+                <span className="badge badge-empty">Kosong</span><span className="text-sm font-medium text-slate-500">0 - 10 unit</span>
+              </div>
+              <div className="flex justify-between items-center border-b border-slate-50 pb-2">
+                <span className="badge badge-low">Sepi</span><span className="text-sm font-medium text-slate-500">11 - 20 unit</span>
+              </div>
+              <div className="flex justify-between items-center border-b border-slate-50 pb-2">
+                <span className="badge badge-medium">Sedang</span><span className="text-sm font-medium text-slate-500">21 - 30 unit</span>
+              </div>
+              <div className="flex justify-between items-center border-b border-slate-50 pb-2">
+                <span className="badge badge-high">Padat</span><span className="text-sm font-medium text-slate-500">31 - 40 unit</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="badge badge-heavy">Macet</span><span className="text-sm font-medium text-slate-500">&gt; 40 unit</span>
+              </div>
+            </div>
           </div>
-          
+
         </div>
 
         {/* Recent Highlights */}
