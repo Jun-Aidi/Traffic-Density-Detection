@@ -30,6 +30,12 @@ export default function DashboardPage() {
 
   const [highlights, setHighlights] = useState([]);
 
+  const [weather, setWeather] = useState({
+    temp: '...',
+    desc: 'Memuat...',
+    icon: '☁️'
+  });
+
   useEffect(() => {
     // 1. Fetch Stats
     fetch('http://127.0.0.1:8000/dashboard-stats')
@@ -77,6 +83,30 @@ export default function DashboardPage() {
         }
       })
       .catch(err => console.error("Error fetching current prediction:", err));
+
+    // 3. Fetch Weather Data
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=-6.2088&longitude=106.8456&current_weather=true')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.current_weather) {
+          const code = data.current_weather.weathercode;
+          let desc = 'Cerah';
+          let icon = '☀️';
+          if (code >= 1 && code <= 3) { desc = 'Berawan'; icon = '⛅'; }
+          else if (code >= 45 && code <= 48) { desc = 'Berkabut'; icon = '🌫️'; }
+          else if (code >= 51 && code <= 67) { desc = 'Hujan Ringan'; icon = '🌧️'; }
+          else if (code >= 71 && code <= 77) { desc = 'Salju'; icon = '❄️'; }
+          else if (code >= 80 && code <= 82) { desc = 'Hujan Deras'; icon = '🌧️'; }
+          else if (code >= 95 && code <= 99) { desc = 'Badai Petir'; icon = '⛈️'; }
+          
+          setWeather({
+            temp: `${Math.round(data.current_weather.temperature)}°C`,
+            desc,
+            icon
+          });
+        }
+      })
+      .catch(err => console.error("Error fetching weather:", err));
   }, []);
 
   const STATS = [
@@ -147,9 +177,38 @@ export default function DashboardPage() {
         {/* Left Column (Status + Indicators) */}
         <div className="flex flex-col gap-6">
 
+          {/* Cuaca Widget */}
+          <div className="card p-6 flex flex-col gap-3 bg-gradient-to-br from-sky-500 to-indigo-600 border-0 shadow-lg shadow-indigo-500/20 relative overflow-hidden transform hover:-translate-y-1 transition-transform duration-300">
+            {/* Background Icon Detail */}
+            <div className="absolute top-[-20%] right-[-10%] p-4 opacity-10 pointer-events-none">
+              <svg className="w-40 h-40 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M19.362 10.929C19.674 10.334 20 9.7 20 9c0-3.314-2.686-6-6-6-2.124 0-3.996 1.107-5.066 2.784A4.985 4.985 0 008 5C5.239 5 3 7.239 3 10c0 2.228 1.458 4.103 3.473 4.757-.021.135-.045.27-.045.41 0 2.667 2.163 4.833 4.833 4.833 2.115 0 3.916-1.353 4.58-3.238.169.016.338.038.512.038 2.608 0 4.72-2.112 4.72-4.72 0-1.042-.338-2.008-.911-2.793v-.358z"/></svg>
+            </div>
+            
+            <div className="relative z-10 flex flex-col">
+              <h3 className="text-[11px] font-bold text-sky-100 uppercase tracking-widest mb-3 flex items-center gap-1.5 opacity-90">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                Jakarta Pusat
+              </h3>
+              
+              <div className="flex items-center gap-4">
+                <span className="text-5xl filter drop-shadow-md">{weather.icon}</span>
+                <div>
+                  <div className="text-3xl font-black text-white tracking-tight">{weather.temp}</div>
+                  <div className="text-sm font-medium text-sky-100 mt-0.5">{weather.desc}</div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="relative z-10 mt-2 pt-3 border-t border-white/20">
+              <p className="text-[11px] text-sky-100/90 leading-tight">
+                Prediksi cuaca terintegrasi untuk melihat dampak potensi pada volume jalan.
+              </p>
+            </div>
+          </div>
+
           {/* Current Status */}
           <div className="card p-6 flex flex-col gap-5">
-            <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Status Saat Ini</h3>
+            <h3 className="text-sm font-semibold text-slate-700 uppercase tracking-wider">Prediksi Saat Ini</h3>
 
             <div className={`rounded-2xl p-5 text-center border-2 ${currentStatus.bg} ${currentStatus.border}`}>
               <div className={`text-5xl font-black mb-2 ${currentStatus.color}`}>{currentStatus.label}</div>

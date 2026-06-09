@@ -50,82 +50,84 @@ def load_analytics_data():
 
     csv_files = glob.glob(os.path.join(DATA_DIR, "*.csv"))
     
-    total_rows = 0
-    categories = {}
-    counts = [0] * 6  # col 3 to 8 sums
-    
-    # For average per hour (06:00 to 23:00)
-    # We will initialize an array for hours 6 to 23 (18 elements)
-    hour_counts = {h: [] for h in range(6, 24)} 
-    
-    # 1. Hour Data (Average vehicles per hour)
-    hour_data_list = []
-    max_avg = -1
-    busiest_hour = 6
-    
-    # Track top record per day for highlights
-    daily_max = {}
-    
+    if not csv_files:
+        return {
+            "hour_data": [0]*18,
+            "density_dist": [],
+            "vehicle_types": [],
+            "total_data": 0,
+            "busiest_hour": "06:00 - 06:59",
+            "highlights": []
+        }
+
+    df_list = []
     for f in csv_files:
         try:
             day_name = os.path.basename(f).replace('.csv', '')
-            df = pd.read_csv(f, header=None)
-            
-            max_count_for_day = -1
-            best_time = "00:00"
-            best_cat = "Empty"
-            
-            for _, row in df.iterrows():
-                if len(row) < 9:
-                    continue
-                
-                total_rows += 1
-                cat = str(row[2])
-                categories[cat] = categories.get(cat, 0) + 1
-                
-                for i in range(6):
-                    try:
-                        counts[i] += int(row[3+i])
-                    except:
-                        pass
-                
-                try:
-                    dt = pd.to_datetime(row[1])
-                    total_count = int(row[3])
-                    if 6 <= dt.hour <= 23:
-                        hour_counts[dt.hour].append(total_count)
-                        
-                    # Find max for highlight
-                    if total_count > max_count_for_day:
-                        max_count_for_day = total_count
-                        best_time = f"{str(dt.hour).zfill(2)}:{str(dt.minute).zfill(2)}"
-                        best_cat = cat
-                except:
-                    pass
-                    
-            if max_count_for_day >= 0:
-                daily_max[day_name] = {
-                    "day": day_name,
-                    "time": best_time,
-                    "density": best_cat,
-                    "count": max_count_for_day
-                }
+            df = pd.read_csv(f, header=None, names=['idx', 'dt', 'cat', 'total', 'sepeda', 'motor', 'mobil', 'bus', 'truk'])
+            df = df.dropna()
+            df['day_name'] = day_name
+            df_list.append(df)
         except Exception as e:
             print(f"Error reading {f}: {e}")
-            pass
             
-    # Process Hour Data
+    if not df_list:
+        return {}
+
+    full_df = pd.concat(df_list, ignore_index=True)
+    full_df['dt'] = pd.to_datetime(full_df['dt'], errors='coerce')
+    full_df = full_df.dropna(subset=['dt'])
+    
+    full_df['hour'] = full_df['dt'].dt.hour
+    full_df['minute'] = full_df['dt'].dt.minute
+    
+    total_rows = len(full_df)
+    
+    # Categories counts
+    categories = full_df['cat'].value_counts().to_dict()
+    
+    # Vehicle sums
+    counts = [
+        full_df['total'].sum(),
+        full_df['sepeda'].sum(),
+        full_df['motor'].sum(),
+        full_df['mobil'].sum(),
+        full_df['bus'].sum(),
+        full_df['truk'].sum()
+    ]
+    
+    # Average vehicles per hour (6 to 23)
+    valid_hours = full_df[(full_df['hour'] >= 6) & (full_df['hour'] <= 23)]
+    hour_means = valid_hours.groupby('hour')['total'].mean().to_dict()
+    
+    max_avg = -1
+    busiest_hour = 6
+    hour_data_list = []
+    
     for h in range(6, 24):
-        h_list = hour_counts[h]
-        avg = int(sum(h_list) / len(h_list)) if len(h_list) > 0 else 0
+        avg = int(hour_means.get(h, 0))
         hour_data_list.append(avg)
         if avg > max_avg:
             max_avg = avg
             busiest_hour = h
             
     busiest_hour_str = f"{str(busiest_hour).zfill(2)}:00 - {str(min(busiest_hour+1, 23)).zfill(2)}:59"
+    
+    # Highlights: Top 1 record per day
+    idx_max = full_df.groupby('day_name')['total'].idxmax()
+    top_records = full_df.loc[idx_max]
+    
+    highlights = []
+    for _, row in top_records.iterrows():
+        time_str = f"{str(row['hour']).zfill(2)}:{str(row['minute']).zfill(2)}"
+        highlights.append({
+            "day": row['day_name'],
+            "time": time_str,
+            "density": row['cat'],
+            "count": int(row['total'])
+        })
         
-    # 2. Density Distribution (%)
+    # Density Distribution
     density_dist = []
     color_map = {
         'Empty': 'bg-slate-400', 'Low': 'bg-green-500', 'Medium': 'bg-amber-500', 
@@ -147,7 +149,7 @@ def load_analytics_data():
     density_order = ['Kosong (Empty)', 'Sepi (Low)', 'Sedang (Medium)', 'Padat (High)', 'Macet (Heavy)']
     density_dist.sort(key=lambda x: density_order.index(x['label']) if x['label'] in density_order else 99)
             
-    # 3. Vehicle Composition (%)
+    # Vehicle Composition
     total_vehicles = sum(counts[1:]) 
     vehicle_types = []
     if total_vehicles > 0:
@@ -160,12 +162,10 @@ def load_analytics_data():
         ]
         vehicle_types.sort(key=lambda x: x['pct'], reverse=True)
 
-    # 4. Highlights (Top 5 busiest days)
-    highlights = list(daily_max.values())
+    # Highlights (Top 5 busiest days)
     highlights.sort(key=lambda x: x['count'], reverse=True)
     highlights = highlights[:5]
     
-    # Map advice and badge
     badge_map = {
         'Empty': 'badge badge-empty', 'Low': 'badge badge-low',
         'Medium': 'badge badge-medium', 'High': 'badge badge-high', 'Heavy': 'badge badge-heavy'
@@ -211,42 +211,44 @@ def load_heatmap_data():
     DAY_ORDER = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']
     HOURS = list(range(6, 24))  # 06:00 - 23:00
 
-    # Initialize accumulator: day -> hour -> list of counts
-    accumulator = {day: {h: [] for h in HOURS} for day in DAY_ORDER}
-
     csv_files = glob.glob(os.path.join(DATA_DIR, "*.csv"))
+    df_list = []
+    
     for f in csv_files:
         try:
             day_name = os.path.basename(f).replace('.csv', '')
             if day_name not in DAY_ORDER:
                 continue
-            df = pd.read_csv(f, header=None)
-            for _, row in df.iterrows():
-                if len(row) < 9:
-                    continue
-                try:
-                    dt = pd.to_datetime(row[1])
-                    total_count = int(row[3])
-                    if 6 <= dt.hour <= 23:
-                        accumulator[day_name][dt.hour].append(total_count)
-                except:
-                    pass
+            df = pd.read_csv(f, header=None, names=['idx', 'dt', 'cat', 'total', 'sepeda', 'motor', 'mobil', 'bus', 'truk'])
+            df = df.dropna()
+            df['day_name'] = day_name
+            df_list.append(df)
         except Exception as e:
             print(f"Heatmap error reading {f}: {e}")
 
-    # Build result matrix: list of {day, hour, avg}
     matrix = []
-    for day in DAY_ORDER:
-        for h in HOURS:
-            vals = accumulator[day][h]
-            avg = round(sum(vals) / len(vals), 1) if vals else 0
-            matrix.append({
-                "day": day,
-                "hour": h,
-                "avg": avg
-            })
+    if df_list:
+        full_df = pd.concat(df_list, ignore_index=True)
+        full_df['dt'] = pd.to_datetime(full_df['dt'], errors='coerce')
+        full_df = full_df.dropna(subset=['dt'])
+        full_df['hour'] = full_df['dt'].dt.hour
+        
+        valid_df = full_df[(full_df['hour'] >= 6) & (full_df['hour'] <= 23)]
+        grouped = valid_df.groupby(['day_name', 'hour'])['total'].mean().to_dict()
+        
+        for day in DAY_ORDER:
+            for h in HOURS:
+                avg = round(grouped.get((day, h), 0), 1)
+                matrix.append({
+                    "day": day,
+                    "hour": h,
+                    "avg": avg
+                })
+    else:
+        for day in DAY_ORDER:
+            for h in HOURS:
+                matrix.append({"day": day, "hour": h, "avg": 0})
 
-    # Global max for normalizing colors
     all_avgs = [item["avg"] for item in matrix]
     global_max = max(all_avgs) if all_avgs else 1
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const DAYS = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
 
@@ -31,6 +31,69 @@ export default function PredictPage({ onAddHistory }) {
   const [minute, setMinute] = useState('00');
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [weather, setWeather] = useState({
+    title: 'Cuaca Saat Ini (Jakarta)',
+    temp: '...',
+    desc: 'Memuat...',
+    icon: '☁️'
+  });
+  const [forecastData, setForecastData] = useState(null);
+
+  function getNextDateStr(dIndex, h) {
+    const now = new Date();
+    let currentOurDay = now.getDay() === 0 ? 6 : now.getDay() - 1;
+    let diff = dIndex - currentOurDay;
+    if (diff < 0) diff += 7;
+    
+    const target = new Date();
+    target.setDate(now.getDate() + diff);
+    
+    const yyyy = target.getFullYear();
+    const mm = String(target.getMonth() + 1).padStart(2, '0');
+    const dd = String(target.getDate()).padStart(2, '0');
+    const hh = String(h).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}T${hh}:00`;
+  }
+
+  function updateWeatherUI(hourly, dIndex, h) {
+    if (!hourly) return;
+    const targetStr = getNextDateStr(dIndex, h);
+    const index = hourly.time.findIndex(t => t === targetStr);
+    
+    if (index !== -1) {
+      const code = hourly.weathercode[index];
+      const temp = hourly.temperature_2m[index];
+      let desc = 'Cerah'; let icon = '☀️';
+      if (code >= 1 && code <= 3) { desc = 'Berawan'; icon = '⛅'; }
+      else if (code >= 45 && code <= 48) { desc = 'Berkabut'; icon = '🌫️'; }
+      else if (code >= 51 && code <= 67) { desc = 'Hujan Ringan'; icon = '🌧️'; }
+      else if (code >= 71 && code <= 77) { desc = 'Salju'; icon = '❄️'; }
+      else if (code >= 80 && code <= 82) { desc = 'Hujan Deras'; icon = '🌧️'; }
+      else if (code >= 95 && code <= 99) { desc = 'Badai Petir'; icon = '⛈️'; }
+      
+      const currentOurDay = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+      const isCurrent = (dIndex === currentOurDay) && (h === new Date().getHours());
+
+      setWeather({
+        title: isCurrent ? 'Cuaca Saat Ini (Jakarta)' : `Prediksi Cuaca (${DAYS[dIndex]} ${String(h).padStart(2, '0')}:00)`,
+        temp: `${Math.round(temp)}°C`,
+        desc,
+        icon
+      });
+    }
+  }
+
+  useEffect(() => {
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=-6.2088&longitude=106.8456&hourly=temperature_2m,weathercode&timezone=Asia%2FJakarta')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.hourly) {
+          setForecastData(data.hourly);
+          updateWeatherUI(data.hourly, new Date().getDay() === 0 ? 6 : new Date().getDay() - 1, new Date().getHours());
+        }
+      })
+      .catch(err => console.error("Error fetching weather:", err));
+  }, []);
 
   async function handlePredict(e) {
     e.preventDefault();
@@ -52,6 +115,7 @@ export default function PredictPage({ onAddHistory }) {
       
       if (data.density) {
         setResult(data.density);
+        updateWeatherUI(forecastData, parseInt(day), parseInt(hour));
         onAddHistory?.({ 
           day: DAYS[day], 
           hour, 
@@ -153,9 +217,34 @@ export default function PredictPage({ onAddHistory }) {
         </form>
       </div>
 
-      {/* Result Card */}
-      <div className="card p-6 flex flex-col">
-        <div className="flex items-center gap-3 mb-6">
+      {/* Right Column */}
+      <div className="flex flex-col gap-6">
+        
+        {/* Cuaca Widget */}
+        <div className="card p-6 flex flex-col gap-3 bg-gradient-to-br from-sky-500 to-indigo-600 border-0 shadow-lg shadow-indigo-500/20 relative overflow-hidden transform hover:-translate-y-1 transition-transform duration-300">
+          <div className="absolute top-[-20%] right-[-10%] p-4 opacity-10 pointer-events-none">
+            <svg className="w-40 h-40 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M19.362 10.929C19.674 10.334 20 9.7 20 9c0-3.314-2.686-6-6-6-2.124 0-3.996 1.107-5.066 2.784A4.985 4.985 0 008 5C5.239 5 3 7.239 3 10c0 2.228 1.458 4.103 3.473 4.757-.021.135-.045.27-.045.41 0 2.667 2.163 4.833 4.833 4.833 2.115 0 3.916-1.353 4.58-3.238.169.016.338.038.512.038 2.608 0 4.72-2.112 4.72-4.72 0-1.042-.338-2.008-.911-2.793v-.358z"/></svg>
+          </div>
+          
+          <div className="relative z-10 flex flex-col">
+            <h3 className="text-[11px] font-bold text-sky-100 uppercase tracking-widest mb-3 flex items-center gap-1.5 opacity-90">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+              {weather.title}
+            </h3>
+            
+            <div className="flex items-center gap-4">
+              <span className="text-5xl filter drop-shadow-md">{weather.icon}</span>
+              <div>
+                <div className="text-3xl font-black text-white tracking-tight">{weather.temp}</div>
+                <div className="text-sm font-medium text-sky-100 mt-0.5">{weather.desc}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Result Card */}
+        <div className="card p-6 flex flex-col flex-1">
+          <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center">
             <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -197,6 +286,7 @@ export default function PredictPage({ onAddHistory }) {
               <p className="text-slate-400 text-sm">Pilih hari dan jam, lalu<br />jalankan prediksi</p>
             </div>
           )}
+        </div>
         </div>
       </div>
     </div>
